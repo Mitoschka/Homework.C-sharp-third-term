@@ -16,20 +16,27 @@ namespace ImitationOfLoadingSteps
         /// </summary>
         static void Main()
         {
-            var splash = Task.Run(() => ShowSplash());
-            var errorOfShowSplash = splash.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
-            var license = splash.ContinueWith(ant => RequestLicense(), TaskContinuationOptions.NotOnCanceled);
-            var errorOfRequestLicense = license.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
-            var setupMenu = license.ContinueWith(ant => SetupMenus(), TaskContinuationOptions.NotOnCanceled);
-            var errorOfSetupMenu = setupMenu.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
-            var update = splash.ContinueWith(ant => CheckUpdate(), TaskContinuationOptions.NotOnCanceled);
-            var errorOfCheckUpdate = update.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
-            var download = update.ContinueWith(ant => DownloadUpdate(), TaskContinuationOptions.NotOnCanceled);
-            var errorOfDownloadUpdate = download.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
-            var display = Task.Factory.ContinueWhenAll(new[] { setupMenu, download }, tasks => DisplayScreen())
-                .ContinueWith(ant => HideSplash());
-            display.Wait();
-            Console.WriteLine(display.IsCompleted);
+            try
+            {
+                var splash = Task.Run(() => ShowSplash());
+                var errorOfShowSplash = splash.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                var license = splash.ContinueWith(ant => RequestLicense(), TaskContinuationOptions.NotOnCanceled);
+                var errorOfRequestLicense = license.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                var setupMenu = license.ContinueWith(ant => SetupMenus(), TaskContinuationOptions.NotOnCanceled);
+                var errorOfSetupMenu = setupMenu.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                var update = splash.ContinueWith(ant => CheckUpdate(), TaskContinuationOptions.NotOnCanceled);
+                var errorOfCheckUpdate = update.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                var download = update.ContinueWith(ant => DownloadUpdate(), TaskContinuationOptions.NotOnCanceled);
+                var errorOfDownloadUpdate = download.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
+                var display = Task.Factory.ContinueWhenAll(new[] { setupMenu, download }, tasks => DisplayScreen())
+                    .ContinueWith(ant => HideSplash());
+                display.Wait();
+                Console.WriteLine(display.IsCompleted);
+            }
+            catch(MyException e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         /// <summary>
