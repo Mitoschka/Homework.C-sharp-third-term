@@ -21,6 +21,7 @@ namespace ImitationOfLoadingSteps
             try
             {
                 var splash = Task.Run(() => ShowSplash());
+                splash.Wait();
                 var errorOfShowSplash = splash.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
                 var license = splash.ContinueWith(ant => RequestLicense(), TaskContinuationOptions.NotOnCanceled);
                 var errorOfRequestLicense = license.ContinueWith(ant => Console.WriteLine(ant.Exception), TaskContinuationOptions.OnlyOnFaulted);
@@ -48,7 +49,7 @@ namespace ImitationOfLoadingSteps
         {
             String name = "Show splash";
             Console.Write(name);
-            RandomException(name);
+            Console.Write(" (OK)");
         }
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace ImitationOfLoadingSteps
         {
             String name = "Display Welcome Screen";
             Console.Write($"\n\n{name}");
-            RandomException(name);
+            Console.Write(" (OK)");
         }
 
         /// <summary>
@@ -98,7 +99,7 @@ namespace ImitationOfLoadingSteps
         {
             String name = "Hide Splash";
             Console.Write($"\n\n{name}");
-            RandomException(name);
+            Console.Write(" (OK)");
         }
 
         /// <summary>
@@ -125,10 +126,11 @@ namespace ImitationOfLoadingSteps
                 {
                     throw new MyException(name);
                 }
+                Console.Write(" (OK)");
             }
             catch (MyException e)
             {
-                Console.Write($"    --> Error with : {e.Message}");
+                Console.Write($" (Failure --> Error with : {e.Message})");
                 result = "Program not completed";
             }
         }
