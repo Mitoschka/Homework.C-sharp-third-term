@@ -1,5 +1,4 @@
 ﻿using System;
-using BenchmarkDotNet.Attributes;
 
 namespace MeasuringGarbageCollectionOverhead
 {
@@ -13,18 +12,12 @@ namespace MeasuringGarbageCollectionOverhead
         public Finalizable(int number)
         {
             this.number = number;
-            lock (lockObject)
-            {
-                Console.WriteLine("Object {0,2} is created", number);
-            }
+            Console.WriteLine("Object {0,2} is created", number);
         }
 
         ~Finalizable()
         {
-            lock (lockObject)
-            {
-                Console.WriteLine("Object {0,2} is disposed", number);
-            }
+            Console.WriteLine("Object {0,2} is disposed", number);
         }
     }
 }
