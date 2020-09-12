@@ -26,6 +26,8 @@ namespace MeasuringGarbageCollectionOverhead
                 this.number = number;
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Object {0} is created", number);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture) + "\n");
             }
         }
 
@@ -36,8 +38,6 @@ namespace MeasuringGarbageCollectionOverhead
         {
             lock (lockObject)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("\n" + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture));
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Object {0} is disposed", number);
                 Console.ForegroundColor = ConsoleColor.Yellow;
