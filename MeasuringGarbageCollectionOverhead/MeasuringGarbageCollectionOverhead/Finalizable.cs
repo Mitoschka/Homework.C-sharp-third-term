@@ -20,11 +20,13 @@ namespace MeasuringGarbageCollectionOverhead
         private static int startMinute;
         private static int startSecond;
         private static int startMillisecond;
+        private static DateTime start;
 
         private int endHour;
         private int endMinute;
         private int endSecond;
         private int endMillisecond;
+        private static DateTime end;
 
         /// <summary>
         /// Method that is called to invoke the garbage collector
@@ -45,12 +47,9 @@ namespace MeasuringGarbageCollectionOverhead
                     endMinute = DateTime.Now.Minute;
                     endSecond = DateTime.Now.Second;
                     endMillisecond = DateTime.Now.Millisecond;
-                    while (endMillisecond > 1000)
-                    {
-                        endMillisecond -= 1000;
-                        endSecond += 1;
-                    }
-                    Console.WriteLine((endHour - startHour) + ":" + (endMinute - startMinute) + ":" + (endSecond - startSecond) + ":" + (endMillisecond - startMillisecond) + "\n");
+                    end = new DateTime(2020, 9, 14, endHour, endMinute, endSecond, endMillisecond);
+                    TimeSpan interval = end - start;
+                    Console.WriteLine(interval + "\n");
                     isFinalizable = false;
                 }
             }
@@ -66,11 +65,7 @@ namespace MeasuringGarbageCollectionOverhead
             startMinute = DateTime.Now.Minute;
             startSecond = DateTime.Now.Second;
             startMillisecond = DateTime.Now.Millisecond;
-            while (startMillisecond > 1000)
-            {
-                startMillisecond -= 1000;
-                startSecond += 1;
-            }
+            start = new DateTime(2020, 9, 14, startHour, startMinute, startSecond, startMillisecond);
         }
     }
 }
