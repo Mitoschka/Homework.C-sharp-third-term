@@ -12,8 +12,19 @@ namespace MeasuringGarbageCollectionOverhead
     public class Finalizable
     {
         private int number;
-        private byte[] memory = new byte[2100000000];
+        private byte[] memory = new byte[2000000000];
         private static object lockObject = new object();
+        private static bool isFinalizable;
+
+        private static int startHour;
+        private static int startMinute;
+        private static int startSecond;
+        private static int startMillisecond;
+
+        private int endHour;
+        private int endMinute;
+        private int endSecond;
+        private int endMillisecond;
 
         /// <summary>
         /// Method that is called to invoke the garbage collector
@@ -21,13 +32,27 @@ namespace MeasuringGarbageCollectionOverhead
         /// <param name="number">Serial number of the object</param>
         public Finalizable(int number)
         {
-            lock (lockObject)
+            if (isFinalizable == true)
             {
-                this.number = number;
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Object {0} is created", number);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture) + "\n");
+                lock (lockObject)
+                {
+                    this.number = number;
+
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Object {0} is created", number);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    endHour = DateTime.Now.Hour;
+                    endMinute = DateTime.Now.Minute;
+                    endSecond = DateTime.Now.Second;
+                    endMillisecond = DateTime.Now.Millisecond;
+                    while (endMillisecond > 1000)
+                    {
+                        endMillisecond -= 1000;
+                        endSecond += 1;
+                    }
+                    Console.WriteLine((endHour - startHour) + ":" + (endMinute - startMinute) + ":" + (endSecond - startSecond) + ":" + (endMillisecond - startMillisecond) + "\n");
+                    isFinalizable = false;
+                }
             }
         }
 
@@ -36,12 +61,15 @@ namespace MeasuringGarbageCollectionOverhead
         /// </summary>
         ~Finalizable()
         {
-            lock (lockObject)
+            isFinalizable = true;
+            startHour = DateTime.Now.Hour;
+            startMinute = DateTime.Now.Minute;
+            startSecond = DateTime.Now.Second;
+            startMillisecond = DateTime.Now.Millisecond;
+            while (startMillisecond > 1000)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Object {0} is disposed", number);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffff", CultureInfo.InvariantCulture) + "\n");
+                startMillisecond -= 1000;
+                startSecond += 1;
             }
         }
     }
