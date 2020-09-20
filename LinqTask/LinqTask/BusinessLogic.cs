@@ -10,38 +10,45 @@ namespace LinqTask
     /// <summary>
     /// Business logic class for data processing
     /// </summary>
-    class BusinessLogic
+    public class BusinessLogic
     {
         private List<User> users = new List<User>();
         private List<Record> records = new List<Record>();
 
-        /// <summary>
-        /// Get random ID
-        /// </summary>
-        /// <returns>Random ID</returns>
-        static int GetRandomID()
-        {
-            Random rnd = new Random();
-            int id = rnd.Next(10000, 99999);
-
-            return id;
-        }
+        private string Surname { get; set; }
 
         /// <summary>
-        /// 
+        /// Filling both collections with test data
         /// </summary>
         public BusinessLogic()
         {
-            users.Add(new User(GetRandomID(), "Nikola", "Ramsey"));
+            users.Add(new User(55823, "Nikola", "Ramsey"));
             records.Add(new Record(users[0], $"Hello, my name is {users[0].Name} {users[0].Surname}"));
-            users.Add(new User(GetRandomID(), "Jannah", "Cohen"));
+            users.Add(new User(29364, "Jannah", "Cohen"));
             records.Add(new Record(users[1], null));
-            users.Add(new User(GetRandomID(), "Krisha", "Broadhurst"));
+            users.Add(new User(12424, "Krisha", "Broadhurst"));
             records.Add(new Record(users[2], $"Hello, my name is {users[2].Name} {users[2].Surname}"));
+            users.Add(new User(12424, "Daniyal", "Broadhurst"));
+            records.Add(new Record(users[3], $"Hello, my name is {users[3].Name} {users[3].Surname}"));
+            users.Add(new User(92573, "Daniyal", "Akhtar"));
+            records.Add(new Record(users[4], $"Hello, my name is {users[4].Name} {users[4].Surname}"));
             Console.WriteLine($"{records[0].Author}\nMessage: {records[0].Message}\n");
             Console.WriteLine($"{records[1].Author}\nMessage: {records[1].Message}\n");
             Console.WriteLine($"{records[2].Author}\nMessage: {records[2].Message}\n");
+            Console.WriteLine($"{records[3].Author}\nMessage: {records[3].Message}\n");
+            Console.WriteLine($"{records[4].Author}\nMessage: {records[4].Message}\n");
         }
+
+        public User GetUser(int i)
+        {
+            return users[i];
+        }
+
+        public int GetCountOfUsers()
+        {
+            return users.Count;
+        }
+
 
         /// <summary>
         /// Get users by surname
@@ -50,10 +57,13 @@ namespace LinqTask
         /// <returns>List of users by surname</returns>
         public List<User> GetUsersBySurname(String surname)
         {
-            var element = from user in users
-                          where user.Equals(surname)
-                          select user;
-            return element.ToList();
+            List<User> usersBySurname = new List<User>();
+
+            var element = (from user in users
+                           where user.Surname == surname
+                           select user).ToList();
+
+            return element;
         }
 
         /// <summary>
@@ -98,15 +108,7 @@ namespace LinqTask
                     usersBySubstring.Add(users[i]);
                 }
             }
-            if (usersBySubstring.Count > 1)
-            {
-                return usersBySubstring;
-            }
-            else
-            {
-                Single();
-                return null;
-            }
+            return usersBySubstring;
         }
 
         /// <summary>
@@ -121,20 +123,12 @@ namespace LinqTask
             {
                 uniqueNames[i] = users[i].Name;
             }
-            IEnumerable<string> distinctNames = uniqueNames;
+            IEnumerable<string> distinctNames = uniqueNames.Distinct();
             foreach (string name in distinctNames)
             {
                 usersUniqueNames.Add(name);
             }
-            if (usersUniqueNames.Count > 1)
-            {
-                return usersUniqueNames;
-            }
-            else
-            {
-                Single();
-                return null;
-            }
+            return usersUniqueNames;
         }
 
         /// <summary>
@@ -152,25 +146,20 @@ namespace LinqTask
                     usersByMessage.Add(users[i]);
                 }
             }
-            if (usersByMessage.Count > 1)
-            {
-                return usersByMessage;
-            }
-            else
-            {
-                Single();
-                return null;
-            }
+            return usersByMessage;
         }
 
         /// <summary>
         /// Get users dictionary
         /// </summary>
         /// <returns>Users dictionary</returns>
-        public Dictionary<int, User> GetUsersDictionary()
+        public Dictionary<string, User> GetUsersDictionary()
         {
-            Dictionary<int, User> dictionary = users.ToDictionary(p => p.ID);
-            return dictionary;
+            Dictionary<string, User> dictionary = new Dictionary<string, User>();
+            var people = users
+                .GroupBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+            return people;
         }
 
         /// <summary>
@@ -233,8 +222,14 @@ namespace LinqTask
         /// <returns>Reversed list of users</returns>
         public List<User> GetReversedUsers()
         {
-            users.Reverse();
-            return users;
+            List<User> orderedReversed = new List<User>();
+
+            for (int i = 0; i < users.Count; i++)
+            {
+                orderedReversed.Add(users[i]);
+            }
+            orderedReversed.Reverse();
+            return orderedReversed;
         }
 
         /// <summary>

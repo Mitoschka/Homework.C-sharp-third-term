@@ -8,7 +8,7 @@ namespace LinqTask
     /// <summary>
     /// A Record entity class that depends on User.
     /// </summary>
-    class Record
+    public class Record
     {
         public User Author { get; set; }
         public String Message { get; set; }
