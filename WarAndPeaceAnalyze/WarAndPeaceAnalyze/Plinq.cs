@@ -36,17 +36,15 @@ namespace WarAndPeaceAnalyze
              .Distinct()
              .ToDictionary(obj => obj.Name, obj => obj.Count));
             int i = 0;
-            foreach (KeyValuePair<string, int> pair in result)
+            foreach (var pair in result.Where(pair => pair.Key.Length > 3))
             {
-                if (pair.Key.Length > 3)
-                {
-                    string word = pair.Key;
-                    word = word.Replace(",", "");
-                    words.Add(word);
-                    countOfWords.Add(pair.Value);
-                    i++;
-                }
+                string word = pair.Key;
+                word = word.Replace(",", "");
+                words.Add(word);
+                countOfWords.Add(pair.Value);
+                i++;
             }
+
             Console.WriteLine("   Toп 10 слов\n");
             for (int k = 1; k < 11; k++)
             {
@@ -59,6 +57,9 @@ namespace WarAndPeaceAnalyze
                     Console.Write($"{k}  место - ");
                 }
                 GetMaxCount();
+                Console.WriteLine($"({words[count]} = {countOfWords[count]})");
+                countOfWords.RemoveAt(count);
+                words.RemoveAt(count);
             }
         }
 
@@ -77,9 +78,6 @@ namespace WarAndPeaceAnalyze
                     count = i;
                 }
             }
-            Console.WriteLine($"({words[count]} = {countOfWords[count]})");
-            countOfWords.RemoveAt(count);
-            words.RemoveAt(count);
         }
     }
 }
