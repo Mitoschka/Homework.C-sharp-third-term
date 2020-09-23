@@ -13,9 +13,7 @@ namespace WarAndPeaceAnalyze
     /// </summary>
     class Plinq
     {
-        private List<string> words = new List<string>();
-        private List<int> countOfWords = new List<int>();
-        private int count = 0;
+        private readonly List<string> words = new List<string>();
 
         /// <summary>
         /// Collects data for further analysis.
@@ -41,43 +39,32 @@ namespace WarAndPeaceAnalyze
                 string word = pair.Key;
                 word = word.Replace(",", "");
                 words.Add(word);
-                countOfWords.Add(pair.Value);
                 i++;
             }
 
-            Console.WriteLine("   Toп 10 слов\n");
-            for (int k = 1; k < 11; k++)
+            Console.WriteLine("\n   Toп 10 слов\n");
+            string[] tenMostCommon = FindTenMostCommon();
+            int place = 1;
+            foreach (var word in tenMostCommon)
             {
-                if (k == 10)
-                {
-                    Console.Write($"{k} место - ");
-                }
-                else
-                {
-                    Console.Write($"{k}  место - ");
-                }
-                GetMaxCount();
-                Console.WriteLine($"({words[count]} = {countOfWords[count]})");
-                countOfWords.RemoveAt(count);
-                words.RemoveAt(count);
+                Console.WriteLine($"{place} место - {word}");
+                place++;
             }
         }
 
         /// <summary>
         /// Returns the most frequently repeated word from the list.
         /// </summary>
-        public void GetMaxCount()
+        private string[] FindTenMostCommon()
         {
-            int maxValue = countOfWords[0];
-
-            for (int i = 1; i < countOfWords.Count; i++)
-            {
-                if (maxValue < countOfWords[i])
-                {
-                    maxValue = countOfWords[i];
-                    count = i;
-                }
-            }
+            var frequencyOrder = from word in words
+                                 where word.Length > 3
+                                 group word by word into g
+                                 orderby g.Count() descending
+                                 select g.Key;
+            string[] commonWords = (frequencyOrder.Take(10)).ToArray();
+            return commonWords;
         }
+
     }
 }
