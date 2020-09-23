@@ -62,7 +62,7 @@ namespace WarAndPeaceAnalyze
                                  group word by word into g
                                  orderby g.Count() descending
                                  select g.Key;
-            string[] commonWords = (frequencyOrder.Take(10)).ToArray();
+            string[] commonWords = (frequencyOrder.AsParallel().Take(10)).ToArray();
             return commonWords;
         }
 
