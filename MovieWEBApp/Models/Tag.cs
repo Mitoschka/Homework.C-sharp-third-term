@@ -8,11 +8,11 @@ namespace MovieWEBApp.Models
         public HashSet<Movie> movies { get; set; }
         public string TagID { get; set; }
 
-        public Tag(string name, string tagID)
+        public Tag(string name, string TagID)
         {
             this.name = name;
             movies = new HashSet<Movie>();
-            this.TagID = tagID;
+            this.TagID = TagID;
         }
     }
 }

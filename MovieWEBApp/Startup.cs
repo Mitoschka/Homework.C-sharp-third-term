@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MovieWEBApp.Data;
+using MovieWEBApp.Data.Repository;
 
 namespace MovieWEBApp
 {
@@ -33,6 +34,7 @@ namespace MovieWEBApp
             });
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddScoped<IRepository, SQLRepository>();
             services.AddSingleton<WeatherForecastService>();
         }
 

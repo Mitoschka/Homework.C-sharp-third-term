@@ -15,7 +15,7 @@ namespace MovieWEBApp.Models
         public float averageRating { get; set; }
         public string MovieID { get; set; }
 
-        public Movie(string title, string language, string movieID)
+        public Movie(string title, string language, string MovieID)
         {
             this.title = title;
             this.language = language;

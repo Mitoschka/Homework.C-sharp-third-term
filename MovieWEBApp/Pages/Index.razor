@@ -1,7 +1,31 @@
-﻿@page "/"
+﻿@inject MovieWEBApp.Data.Repository.IRepository repository;
 
-<h1>Hello, world!</h1>
+@page "/"
 
-Welcome to your new app.
+<h1 class="text-center text-primary">Movie Search</h1>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<div class="text-center">
+    <div class="p-2">
+        <input class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="_searchTerm" />
+    </div>
+    <div class="p-2">
+        <button class="btn btn-primary btn-lg" @onclick="HandleSearch">Search the Movie API</button>
+    </div>
+</div>
+
+@code
+{
+    private string _searchTerm;
+
+    private bool isOk = false;
+
+    protected override void OnInitialized()
+    {
+        isOk = repository.GetMovieDB();
+    }
+
+    private async Task HandleSearch()
+    {
+        Console.WriteLine(_searchTerm);
+    }
+}

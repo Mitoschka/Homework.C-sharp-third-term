@@ -9,13 +9,13 @@ namespace MovieWEBApp.Data.Repository
 {
     public class SQLRepository : IRepository
     {
-        const string pathMovieCodes = "MovieCodes_IMDB.tsv";
-        const string pathRatings = "Ratings_IMDB.tsv";
-        const string pathActorsDirectorsCodes = "ActorsDirectorsCodes_IMDB.tsv";
-        const string pathActorsDirectorsNames = "ActorsDirectorsNames_IMDB.txt";
-        const string pathLinks = "links_IMDB_MovieLens.csv";
-        const string pathTagCodes = "TagCodes_MovieLens.csv";
-        const string pathTagScores = "TagScores_MovieLens.csv";
+        const string pathMovieCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\MovieCodes_IMDB.tsv";
+        const string pathRatings = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\Ratings_IMDB.tsv";
+        const string pathActorsDirectorsCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\ActorsDirectorsCodes_IMDB.tsv";
+        const string pathActorsDirectorsNames = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\ActorsDirectorsNames_IMDB.txt";
+        const string pathLinks = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\links_IMDB_MovieLens.csv";
+        const string pathTagCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\TagCodes_MovieLens.csv";
+        const string pathTagScores = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\TagScores_MovieLens.csv";
 
         // IMDBID - string
         public static Dictionary<string, Movie> moviesWithImdbID = new Dictionary<string, Movie>();
@@ -33,7 +33,7 @@ namespace MovieWEBApp.Data.Repository
             this.context = context;
         }
 
-        public void GetMovieDB()
+        public bool GetMovieDB()
         {
             GetDictionaryOfMoviesAndImdbID();
             GetDictionaryOfStaffNames();
@@ -42,39 +42,35 @@ namespace MovieWEBApp.Data.Repository
             GetMovieLinks();
             GetTagScores();
             GetRatingsOfMovies();
-            Task t1 = Task.Run(() =>
+            foreach (var movie in moviesWithImdbID)
             {
-                // Cycle through each item.
-                foreach (var movie in moviesWithImdbID)
+                Movie currentMovie = new Movie(movie.Value.title, movie.Value.language, movie.Value.MovieID);
+                if (!context.Movies.Contains(currentMovie))
                 {
-                    Movie currentMovie = new Movie(movie.Value.title, movie.Value.language, movie.Value.MovieID);
                     context.Movies.Add(currentMovie);
                 }
-                context.SaveChanges();
-
-            });
-            Task t2 = Task.Run(() =>
+            }
+            context.SaveChanges();
+            foreach (var tag in tagsWithID)
             {
-                // Cycle through each item.
-                foreach (var tag in tagsWithID)
+                Tag currentTag = new Tag(tag.Value.name, tag.Value.TagID);
+                if (!context.Tags.Contains(currentTag))
                 {
-                    Tag currentTag = new Tag(tag.Value.name, tag.Value.TagID);
                     context.Tags.Add(currentTag);
                 }
-                context.SaveChanges();
-
-            });
-            Task t3 = Task.Run(() =>
+            }
+            context.SaveChanges();
+            foreach (var staff in staffsWithID)
             {
-                foreach (var staff in staffsWithID)
+                Staff currentStaff = new Staff(staff.Value.fullName, staff.Value.StaffID);
+                if (!context.Staffs.Contains(currentStaff))
                 {
-                    Staff currentStaff = new Staff(staff.Value.fullName, staff.Value.StaffID);
                     context.Staffs.Add(currentStaff);
                 }
-                context.SaveChanges();
-            });
-            Task.WaitAll(t1, t2, t3);
+            }
+            context.SaveChanges();
             Console.WriteLine("Объекты успешно сохранены");
+            return true;
         }
 
         /* public void SearchMovie(string movieName)

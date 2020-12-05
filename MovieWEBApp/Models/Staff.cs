@@ -9,12 +9,12 @@ namespace MovieWEBApp.Models
         public HashSet<Movie> isDirector { get; set; }
         public string StaffID { get; set; }
 
-        public Staff(string fullName, string staffID)
+        public Staff(string fullName, string StaffID)
         {
             this.fullName = fullName;
             isActor = new HashSet<Movie>();
             isDirector = new HashSet<Movie>();
-            this.StaffID = staffID;
+            this.StaffID = StaffID;
         }
     }
 }
