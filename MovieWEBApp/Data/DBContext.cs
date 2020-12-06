@@ -12,6 +12,7 @@ namespace MovieWEBApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder
              .Entity<Movie>()
              .HasMany(p => p.actors)

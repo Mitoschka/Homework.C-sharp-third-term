@@ -9,7 +9,7 @@ using MovieWEBApp.Data;
 namespace MovieWEBApp.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20201204183822_InitDB")]
+    [Migration("20201206153116_InitDB")]
     partial class InitDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

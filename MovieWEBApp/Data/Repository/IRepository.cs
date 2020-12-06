@@ -8,6 +8,5 @@ namespace MovieWEBApp.Data.Repository
     public interface IRepository
     {
         bool GetMovieDB();
-       // void SearchMovie(string movieName);
     }
 }

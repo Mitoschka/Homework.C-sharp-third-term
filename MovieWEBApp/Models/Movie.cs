@@ -8,7 +8,6 @@ namespace MovieWEBApp.Models
     {
         public string title { get; set; }
         public string language { get; set; }
-
         public HashSet<Staff> actors { get; set; }
         public HashSet<Staff> directors { get; set; }
         public HashSet<Tag> tags { get; set; }

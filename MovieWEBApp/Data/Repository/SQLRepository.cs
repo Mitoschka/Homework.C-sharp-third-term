@@ -18,7 +18,7 @@ namespace MovieWEBApp.Data.Repository
         const string pathTagScores = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\TagScores_MovieLens.csv";
 
         // IMDBID - string
-        public static Dictionary<string, Movie> moviesWithImdbID = new Dictionary<string, Movie>();
+        static Dictionary<string, Movie> moviesWithImdbID = new Dictionary<string, Movie>();
         static Dictionary<string, Staff> staffsWithID = new Dictionary<string, Staff>();
         static Dictionary<int, Tag> tagsWithID = new Dictionary<int, Tag>();
         static Dictionary<int, string> tmdbIDAndImdbID = new Dictionary<int, string>();
@@ -42,41 +42,24 @@ namespace MovieWEBApp.Data.Repository
             GetMovieLinks();
             GetTagScores();
             GetRatingsOfMovies();
-            foreach (var movie in moviesWithImdbID)
-            {
-                Movie currentMovie = new Movie(movie.Value.title, movie.Value.language, movie.Value.MovieID);
-                if (!context.Movies.Contains(currentMovie))
-                {
-                    context.Movies.Add(currentMovie);
-                }
-            }
-            context.SaveChanges();
-            foreach (var tag in tagsWithID)
-            {
-                Tag currentTag = new Tag(tag.Value.name, tag.Value.TagID);
-                if (!context.Tags.Contains(currentTag))
-                {
-                    context.Tags.Add(currentTag);
-                }
-            }
-            context.SaveChanges();
-            foreach (var staff in staffsWithID)
-            {
-                Staff currentStaff = new Staff(staff.Value.fullName, staff.Value.StaffID);
-                if (!context.Staffs.Contains(currentStaff))
-                {
-                    context.Staffs.Add(currentStaff);
-                }
-            }
-            context.SaveChanges();
-            Console.WriteLine("Объекты успешно сохранены");
+            FillMovieToContext();
+            /*string tempImdbId = Console.ReadLine();
+            List<Movie> similarMovie = moviesWithImdbID[tempImdbId].GetSimilarMovies();
+            foreach (var movie in similarMovie)
+                Console.WriteLine(movie.title);
+            Console.WriteLine($"{moviesWithImdbID.Count} {staffsWithID.Count} {tagsWithID.Count}");*/
             return true;
         }
 
-        /* public void SearchMovie(string movieName)
-         {
-             throw new NotImplementedException();
-         }*/
+        private void FillMovieToContext()
+        {
+            foreach (var item in moviesWithImdbID)
+            {
+                context.Movies.Add(item.Value);
+                context.SaveChanges();
+                break;
+            }
+        }
 
         public static void GetDictionaryOfMoviesAndImdbID()
         {
@@ -165,11 +148,10 @@ namespace MovieWEBApp.Data.Repository
                 .AsParallel()
                 .Skip(1)
                 .Select(line => line.Split(','));
-
             foreach (var line in tempString)
             {
-                if (line[2] != "" && tmdbIDAndImdbID.ContainsKey(int.Parse(line[2])))
-                    tmdbIDAndImdbID.Add(int.Parse(line[2]), "tt" + line[1]);
+                if (line[0] != "" && !tmdbIDAndImdbID.ContainsKey(int.Parse(line[0])))
+                    tmdbIDAndImdbID.Add(int.Parse(line[0]), "tt" + line[1]);
             }
             Console.WriteLine((DateTime.Now - timeStart).ToString());
         }
@@ -207,11 +189,10 @@ namespace MovieWEBApp.Data.Repository
         public static void ConnectMovieWithStaff(string keyOfMovie, string keyOfStaff, bool isActor)
         {
             if (!(moviesWithImdbID.ContainsKey(keyOfMovie) && staffsWithID.ContainsKey(keyOfStaff)))
-            {
                 return;
-            }
             staffsWithID.TryGetValue(keyOfStaff, out Staff tempStaff);
             moviesWithImdbID.TryGetValue(keyOfMovie, out Movie tempMovie);
+
             if (isActor)
             {
                 tempMovie.actors.Add(tempStaff);
@@ -227,15 +208,11 @@ namespace MovieWEBApp.Data.Repository
         public static void ConnectMovieWithTag(int tmdbID, int tagID)
         {
             if (!(tmdbIDAndImdbID.ContainsKey(tmdbID) && tagsWithID.ContainsKey(tagID)))
-            {
                 return;
-            }
             tmdbIDAndImdbID.TryGetValue(tmdbID, out string imdbID);
             tagsWithID.TryGetValue(tagID, out Tag tag);
             if (!moviesWithImdbID.ContainsKey(imdbID))
-            {
                 return;
-            }
             moviesWithImdbID.TryGetValue(imdbID, out Movie movie);
             movie.tags.Add(tag);
             tag.movies.Add(movie);
