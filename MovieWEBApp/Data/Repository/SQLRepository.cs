@@ -2,23 +2,22 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using MovieWEBApp.Models;
 
 namespace MovieWEBApp.Data.Repository
 {
-    public class SQLRepository : IRepository
+    public class SQLRepository
     {
-        const string pathMovieCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\MovieCodes_IMDB.tsv";
-        const string pathRatings = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\Ratings_IMDB.tsv";
-        const string pathActorsDirectorsCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\ActorsDirectorsCodes_IMDB.tsv";
-        const string pathActorsDirectorsNames = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\ActorsDirectorsNames_IMDB.txt";
-        const string pathLinks = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\links_IMDB_MovieLens.csv";
-        const string pathTagCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\TagCodes_MovieLens.csv";
-        const string pathTagScores = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\TagScores_MovieLens.csv";
+        const string pathMovieCodes = @"MovieCodes_IMDB.tsv";
+        const string pathRatings = @"Ratings_IMDB.tsv";
+        const string pathActorsDirectorsCodes = @"ActorsDirectorsCodes_IMDB.tsv";
+        const string pathActorsDirectorsNames = @"ActorsDirectorsNames_IMDB.txt";
+        const string pathLinks = @"links_IMDB_MovieLens.csv";
+        const string pathTagCodes = @"TagCodes_MovieLens.csv";
+        const string pathTagScores = @"TagScores_MovieLens.csv";
 
         // IMDBID - string
-        static Dictionary<string, Movie> moviesWithImdbID = new Dictionary<string, Movie>();
+        public static Dictionary<string, Movie> moviesWithImdbID = new Dictionary<string, Movie>();
         static Dictionary<string, Staff> staffsWithID = new Dictionary<string, Staff>();
         static Dictionary<int, Tag> tagsWithID = new Dictionary<int, Tag>();
         static Dictionary<int, string> tmdbIDAndImdbID = new Dictionary<int, string>();
@@ -33,7 +32,7 @@ namespace MovieWEBApp.Data.Repository
             this.context = context;
         }
 
-        public bool GetMovieDB()
+        public static void GetMovieDB()
         {
             GetDictionaryOfMoviesAndImdbID();
             GetDictionaryOfStaffNames();
@@ -42,23 +41,11 @@ namespace MovieWEBApp.Data.Repository
             GetMovieLinks();
             GetTagScores();
             GetRatingsOfMovies();
-            FillMovieToContext();
             /*string tempImdbId = Console.ReadLine();
             List<Movie> similarMovie = moviesWithImdbID[tempImdbId].GetSimilarMovies();
             foreach (var movie in similarMovie)
                 Console.WriteLine(movie.title);
             Console.WriteLine($"{moviesWithImdbID.Count} {staffsWithID.Count} {tagsWithID.Count}");*/
-            return true;
-        }
-
-        private void FillMovieToContext()
-        {
-            foreach (var item in moviesWithImdbID)
-            {
-                context.Movies.Add(item.Value);
-                context.SaveChanges();
-                break;
-            }
         }
 
         public static void GetDictionaryOfMoviesAndImdbID()
@@ -89,6 +76,7 @@ namespace MovieWEBApp.Data.Repository
                 .Skip(1)
                 .Select(line => line.Split('\t'))
                 .ToDictionary(line => line[0], line => new Staff(line[1], line[0]));
+
             Console.WriteLine((DateTime.Now - timeStart).ToString());
         }
 
@@ -102,6 +90,7 @@ namespace MovieWEBApp.Data.Repository
                 .Select(line => line.Split(','))
                 .ToDictionary(
                 line => int.Parse(line[0]), line => new Tag(line[1], line[0]));
+
             Console.WriteLine((DateTime.Now - timeStart).ToString());
         }
 
@@ -114,6 +103,7 @@ namespace MovieWEBApp.Data.Repository
                 .Skip(1)
                 .Select(line => line.Split(','))
                 .Where(line => double.Parse(line[2].Replace(".", ",")) > 0.5);
+
             foreach (string[] str in tempStrings)
             {
                 ConnectMovieWithTag(int.Parse(str[0]), int.Parse(str[1]));
@@ -148,10 +138,13 @@ namespace MovieWEBApp.Data.Repository
                 .AsParallel()
                 .Skip(1)
                 .Select(line => line.Split(','));
+
             foreach (var line in tempString)
             {
                 if (line[0] != "" && !tmdbIDAndImdbID.ContainsKey(int.Parse(line[0])))
+                {
                     tmdbIDAndImdbID.Add(int.Parse(line[0]), "tt" + line[1]);
+                }
             }
             Console.WriteLine((DateTime.Now - timeStart).ToString());
         }
@@ -170,17 +163,25 @@ namespace MovieWEBApp.Data.Repository
                 switch (line[3])
                 {
                     case ("director"):
-                        ConnectMovieWithStaff(line[0], line[2], false);
-                        break;
+                        {
+                            ConnectMovieWithStaff(line[0], line[2], false);
+                            break;
+                        }
                     case ("actor"):
-                        ConnectMovieWithStaff(line[0], line[2], true);
-                        break;
+                        {
+                            ConnectMovieWithStaff(line[0], line[2], true);
+                            break;
+                        }
                     case ("actress"):
-                        ConnectMovieWithStaff(line[0], line[2], true);
-                        break;
+                        {
+                            ConnectMovieWithStaff(line[0], line[2], true);
+                            break;
+                        }
                     case ("self"):
-                        ConnectMovieWithStaff(line[0], line[2], true);
-                        break;
+                        {
+                            ConnectMovieWithStaff(line[0], line[2], true);
+                            break;
+                        }
                 }
             }
             Console.WriteLine((DateTime.Now - timeStart).ToString());
@@ -189,10 +190,11 @@ namespace MovieWEBApp.Data.Repository
         public static void ConnectMovieWithStaff(string keyOfMovie, string keyOfStaff, bool isActor)
         {
             if (!(moviesWithImdbID.ContainsKey(keyOfMovie) && staffsWithID.ContainsKey(keyOfStaff)))
+            {
                 return;
+            }
             staffsWithID.TryGetValue(keyOfStaff, out Staff tempStaff);
             moviesWithImdbID.TryGetValue(keyOfMovie, out Movie tempMovie);
-
             if (isActor)
             {
                 tempMovie.actors.Add(tempStaff);
@@ -208,11 +210,15 @@ namespace MovieWEBApp.Data.Repository
         public static void ConnectMovieWithTag(int tmdbID, int tagID)
         {
             if (!(tmdbIDAndImdbID.ContainsKey(tmdbID) && tagsWithID.ContainsKey(tagID)))
+            {
                 return;
+            }
             tmdbIDAndImdbID.TryGetValue(tmdbID, out string imdbID);
             tagsWithID.TryGetValue(tagID, out Tag tag);
             if (!moviesWithImdbID.ContainsKey(imdbID))
+            {
                 return;
+            }
             moviesWithImdbID.TryGetValue(imdbID, out Movie movie);
             movie.tags.Add(tag);
             tag.movies.Add(movie);

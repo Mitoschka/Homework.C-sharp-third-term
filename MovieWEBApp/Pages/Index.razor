@@ -1,32 +1,173 @@
-﻿@inject MovieWEBApp.Data.Repository.IRepository repository;
+﻿@using Microsoft.EntityFrameworkCore;
+@using Microsoft.Extensions.DependencyInjection;
+@using System.Collections.Generic;
+@using System.Text.Json
+@using Microsoft.Extensions.Configuration
+@using System.Net.Http
 
+@inject IConfiguration Config
 @page "/"
+
+<style>
+
+    .hide {
+        display: none;
+    }
+</style>
 
 <h1 class="text-center text-primary">Movie Search</h1>
 
 <div class="text-center">
     <div class="p-2">
-        <input class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="_searchTerm" />
+        <input class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="searchMovie" /><br>
     </div>
     <div class="p-2">
         <button class="btn btn-primary btn-lg" @onclick="HandleSearch">Search the Movie API</button>
     </div>
 </div>
 
+<br>
+<br>
+<br>
+<div style="object-fit: cover; height: 200px; width: 300px" class="container">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+        <div class="col mb-4">
+            <div class="card">
+                <img src="@Image"
+                     class="card-img-top"
+                     style="object-fit: cover; height: auto">
+                <div class="card-body">
+                    <h5 class="card-title">@Name</h5>
+                    <p class="card-text" align="left">
+                        ID:  @ID<br>
+                        Language:  @Language<br>
+                        Rating:  @Rating <br>
+                        <style>
+                            ul {
+                                padding: 0;
+                                margin-left: 20px;
+                            }
+                        </style>
+                    <p></p>
+                    Actors:
+                    @if (movieActor != null && !isHide)
+                    {
+                        <ul>
+                            @foreach (var actor in movieActor)
+                            {
+                                <li>@actor</li>
+                            }
+                        </ul>
+                    }
+                    Directors:
+                    @if (movieDirector != null && !isHide)
+                    {
+                        <ul>
+                            @foreach (var director in movieDirector)
+                            {
+                                <li>@director</li>
+                            }
+                        </ul>
+                    }
+                    Tags:
+                    @if (movieTag != null && !isHide)
+                    {
+                        <ul>
+                            @foreach (var tag in movieTag)
+                            {
+                                <li>@tag</li>
+                            }
+                        </ul>
+                    }
+                    </p>
+                </div>
+                <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @code
 {
-    private string _searchTerm;
+    private string searchMovie;
+    private string Name;
+    private string ID;
+    private string Language;
+    private string Rating;
+    private string Image = "https://via.placeholder.com/300x200";
+    private bool isHide = true;
+    private List<String> movieActor = new List<string>();
+    private List<String> movieDirector = new List<string>();
+    private List<String> movieTag = new List<string>();
+    private MovieModels.Movie movie;
 
-    private bool isOk = false;
-    private int count = 0;
-
-    protected override void OnInitialized()
+    private async Task ShowCard()
     {
-        isOk = repository.GetMovieDB();
+        if (isHide)
+        {
+            isHide = false;
+        }
+        else
+        {
+            isHide = true;
+        }
     }
 
     private async Task HandleSearch()
     {
-        Console.WriteLine(_searchTerm);
+        movieActor = new List<string>();
+        movieDirector = new List<string>();
+        movieTag = new List<string>();
+        Image = "https://via.placeholder.com/300x200";
+        using (var context = new MovieModels.MyMovieDBContext())
+        {
+            movie = context.Movies.FirstOrDefault(Index => Index.Title == searchMovie || Index.MovieId == searchMovie);
+            ID = movie.MovieId;
+            Name = movie.Title;
+            Rating = movie.AverageRating.ToString();
+            Language = movie.Language;
+            var tagID = context.MovieTags.Where(tag => tag.MoviesMovieId == movie.MovieId).ToList();
+            foreach (var tags in tagID)
+            {
+                movieTag.Add(context.Tags.Find(tags.TagsTagId).Name);
+            }
+            var actorID = context.MovieStaffs.Where(actor => actor.IsActorMovieId == movie.MovieId).ToList();
+            foreach (var actor in actorID)
+            {
+                movieActor.Add(context.Staffs.Find(actor.ActorsStaffId).FullName);
+            }
+            var directorID = context.MovieStaff1s.Where(director => director.IsDirectorMovieId == movie.MovieId).ToList();
+            foreach (var director in directorID)
+            {
+                movieDirector.Add(context.Staffs.Find(director.DirectorsStaffId).FullName);
+            }
+        }
+
+        var client = new HttpClient();
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri($"https://imdb8.p.rapidapi.com/title/auto-complete?q={movie.MovieId}"),
+            Headers =
+        {
+            { "x-rapidapi-key", "c52a1ca29amsh6bfb99e075210f4p19de50jsn9d875c09c921" },
+            { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
+        },
+        };
+        using (var response = await client.SendAsync(request))
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            try
+            {
+                int startIndex = body.IndexOf("https");
+                int endIndex = body.IndexOf("width", startIndex);
+                Image = body.Substring(startIndex, (endIndex - startIndex) - 3);
+            }
+            catch
+            {
+                Image = "https://www.p-etalon.ru/global/images/prod/nophoto.png";
+            }
+        }
     }
 }

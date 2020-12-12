@@ -5,19 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="bin\Debug\netcoreapp3.1\ActorsDirectorsNames_IMDB.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="bin\Debug\netcoreapp3.1\ActorsDirectorsCodes_IMDB.tsv" />
-    <None Include="bin\Debug\netcoreapp3.1\links_IMDB_MovieLens.csv" />
-    <None Include="bin\Debug\netcoreapp3.1\MovieCodes_IMDB.tsv" />
-    <None Include="bin\Debug\netcoreapp3.1\Ratings_IMDB.tsv" />
-    <None Include="bin\Debug\netcoreapp3.1\TagCodes_MovieLens.csv" />
-    <None Include="bin\Debug\netcoreapp3.1\TagScores_MovieLens.csv" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.HttpClient" Version="3.2.0-preview3.20168.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="3.2.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0">
