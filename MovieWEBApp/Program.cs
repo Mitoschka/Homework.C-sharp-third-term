@@ -14,6 +14,7 @@ namespace MovieWEBApp
     {
         public static void Main(string[] args)
         {
+            Data.Repository.SQLRepository.GetMovieDB();
             CreateHostBuilder(args).Build().Run();
         }
 

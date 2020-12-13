@@ -12,6 +12,7 @@ namespace MovieWEBApp.Models
         public HashSet<Staff> directors { get; set; }
         public HashSet<Tag> tags { get; set; }
         public float averageRating { get; set; }
+        public List<Movie> similarMovie { get; set; }
         public string MovieID { get; set; }
 
         public Movie(string title, string language, string MovieID)
@@ -111,7 +112,7 @@ namespace MovieWEBApp.Models
             {
                 toReturn.Add(item.Key);
                 counter++;
-                if (counter == 10)
+                if (counter == 9)
                     break;
             }
             return toReturn;

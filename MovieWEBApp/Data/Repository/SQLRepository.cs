@@ -8,13 +8,13 @@ namespace MovieWEBApp.Data.Repository
 {
     public class SQLRepository
     {
-        const string pathMovieCodes = @"MovieCodes_IMDB.tsv";
-        const string pathRatings = @"Ratings_IMDB.tsv";
-        const string pathActorsDirectorsCodes = @"ActorsDirectorsCodes_IMDB.tsv";
-        const string pathActorsDirectorsNames = @"ActorsDirectorsNames_IMDB.txt";
-        const string pathLinks = @"links_IMDB_MovieLens.csv";
-        const string pathTagCodes = @"TagCodes_MovieLens.csv";
-        const string pathTagScores = @"TagScores_MovieLens.csv";
+        const string pathMovieCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\MovieCodes_IMDB.tsv";
+        const string pathRatings = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\Ratings_IMDB.tsv";
+        const string pathActorsDirectorsCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\ActorsDirectorsCodes_IMDB.tsv";
+        const string pathActorsDirectorsNames = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\ActorsDirectorsNames_IMDB.txt";
+        const string pathLinks = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\links_IMDB_MovieLens.csv";
+        const string pathTagCodes = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\TagCodes_MovieLens.csv";
+        const string pathTagScores = @"D:\MovieWEBApp\bin\Debug\netcoreapp3.1\TagScores_MovieLens.csv";
 
         // IMDBID - string
         public static Dictionary<string, Movie> moviesWithImdbID = new Dictionary<string, Movie>();
@@ -34,6 +34,7 @@ namespace MovieWEBApp.Data.Repository
 
         public static void GetMovieDB()
         {
+            int count = 0;
             GetDictionaryOfMoviesAndImdbID();
             GetDictionaryOfStaffNames();
             GetInfoActorsAndDirectors();
@@ -41,11 +42,14 @@ namespace MovieWEBApp.Data.Repository
             GetMovieLinks();
             GetTagScores();
             GetRatingsOfMovies();
-            /*string tempImdbId = Console.ReadLine();
-            List<Movie> similarMovie = moviesWithImdbID[tempImdbId].GetSimilarMovies();
-            foreach (var movie in similarMovie)
-                Console.WriteLine(movie.title);
-            Console.WriteLine($"{moviesWithImdbID.Count} {staffsWithID.Count} {tagsWithID.Count}");*/
+            foreach(var movie in moviesWithImdbID)
+            {
+                string tempImdbId = movie.Key;
+                List<Movie> similarMovie = moviesWithImdbID[tempImdbId].GetSimilarMovies();
+                movie.Value.similarMovie = similarMovie;
+                count++;
+            }
+            Console.WriteLine("hi");
         }
 
         public static void GetDictionaryOfMoviesAndImdbID()

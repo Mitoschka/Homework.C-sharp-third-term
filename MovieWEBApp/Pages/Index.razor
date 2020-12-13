@@ -9,45 +9,54 @@
 @page "/"
 
 <style>
-
-    .hide {
-        display: none;
+body { background-color:darkslateblue }
+    input[type="text"], textarea {
+        background-color: #d1d1d1;
+    }
+    div[type="div"], textarea {
+        background-color: #703D8B;
+    }
+    h1[type="textH1"], text {
+        color:aliceblue;
+    }
+    h5[type="textH5"], text {
+        color: aliceblue;
+    }
+    p[type="textP"], text {
+        color: aliceblue;
+    }
+    img {
+        background-color: #703D8B;
     }
 </style>
 
-<h1 class="text-center text-primary">Movie Search</h1>
+<body>
+    <h1 type="textH1" class="text-center">Movie Search</h1>
 
-<div class="text-center">
-    <div class="p-2">
-        <input class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="searchMovie" /><br>
+    <div class="text-center">
+        <div class="p-2">
+            <input type="text" class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="searchMovie"/><br>
+        </div>
+        <div class="p-2">
+            <button class="btn btn-primary btn-lg" @onclick="HandleSearch">Search the Movie API</button>
+        </div>
     </div>
-    <div class="p-2">
-        <button class="btn btn-primary btn-lg" @onclick="HandleSearch">Search the Movie API</button>
-    </div>
-</div>
 
-<br>
-<br>
-<br>
-<div style="object-fit: cover; height: 200px; width: 300px" class="container">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-        <div class="col mb-4">
-            <div class="card">
+    <br>
+    <br>
+    <br>
+    <div align="center" class="container">
+        <div style="margin-bottom: 40px" class="col col-lg-4">
+            <div class="card h-100">
                 <img src="@Image"
                      class="card-img-top"
-                     style="object-fit: cover; height: auto">
-                <div class="card-body">
-                    <h5 class="card-title">@Name</h5>
-                    <p class="card-text" align="left">
+                     style="object-fit:contain; height: 300px">
+                <div type="div" class="card-body">
+                    <h5 type="textH5" class="card-title">@Name</h5>
+                    <p type="textP" class="card-text" align="left">
                         ID:  @ID<br>
                         Language:  @Language<br>
                         Rating:  @Rating <br>
-                        <style>
-                            ul {
-                                padding: 0;
-                                margin-left: 20px;
-                            }
-                        </style>
                     <p></p>
                     Actors:
                     @if (movieActor != null && !isHide)
@@ -84,90 +93,167 @@
                 <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
             </div>
         </div>
+        <h1 type="textH1" class="text-center">Featured Movies</h1><br>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+            @for (int i = 0; i < 9; i++)
+            {
+                <div style="margin-bottom: 40px" class="col col-lg-4">
+                    <div class="card h-100">
+                        <img src="@Image"
+                             class="card-img-top"
+                             style="object-fit: contain; height: 300px">
+                        <div type="div" class="card-body">
+                            <h5 type="textH5" class="card-title">@Name</h5>
+                            <p type="textP" class="card-text" align="left">
+                                ID:  @ID<br>
+                                Language:  @Language<br>
+                                Rating:  @Rating <br>
+                            <p></p>
+                            Actors:
+                            @if (movieActor != null && !isHide)
+                            {
+                                <ul>
+                                    @foreach (var actor in movieActor)
+                                    {
+                                        <li>@actor</li>
+                                    }
+                                </ul>
+                            }
+                            Directors:
+                            @if (movieDirector != null && !isHide)
+                            {
+                                <ul>
+                                    @foreach (var director in movieDirector)
+                                    {
+                                        <li>@director</li>
+                                    }
+                                </ul>
+                            }
+                            Tags:
+                            @if (movieTag != null && !isHide)
+                            {
+                                <ul>
+                                    @foreach (var tag in movieTag)
+                                    {
+                                        <li>@tag</li>
+                                    }
+                                </ul>
+                            }
+                            </p>
+                        </div>
+                        <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
-</div>
 
 
-@code
+    @code
 {
-    private string searchMovie;
-    private string Name;
-    private string ID;
-    private string Language;
-    private string Rating;
-    private string Image = "https://via.placeholder.com/300x200";
-    private bool isHide = true;
-    private List<String> movieActor = new List<string>();
-    private List<String> movieDirector = new List<string>();
-    private List<String> movieTag = new List<string>();
-    private MovieModels.Movie movie;
+        private string searchMovie;
+        private string Name;
+        private string ID;
+        private string Language;
+        private string Rating;
+        private string Image = "https://via.placeholder.com/300x200";
+        private bool isHide = true;
+        private List<String> TopMovies = new List<string>();
+        private List<String> movieActor = new List<string>();
+        private List<String> movieDirector = new List<string>();
+        private List<String> movieTag = new List<string>();
+        private MovieModels.Movie movie;
 
-    private async Task ShowCard()
-    {
-        if (isHide)
+        private async Task ShowCard()
         {
-            isHide = false;
-        }
-        else
-        {
-            isHide = true;
-        }
-    }
-
-    private async Task HandleSearch()
-    {
-        movieActor = new List<string>();
-        movieDirector = new List<string>();
-        movieTag = new List<string>();
-        Image = "https://via.placeholder.com/300x200";
-        using (var context = new MovieModels.MyMovieDBContext())
-        {
-            movie = context.Movies.FirstOrDefault(Index => Index.Title == searchMovie || Index.MovieId == searchMovie);
-            ID = movie.MovieId;
-            Name = movie.Title;
-            Rating = movie.AverageRating.ToString();
-            Language = movie.Language;
-            var tagID = context.MovieTags.Where(tag => tag.MoviesMovieId == movie.MovieId).ToList();
-            foreach (var tags in tagID)
+            if (isHide)
             {
-                movieTag.Add(context.Tags.Find(tags.TagsTagId).Name);
+                isHide = false;
             }
-            var actorID = context.MovieStaffs.Where(actor => actor.IsActorMovieId == movie.MovieId).ToList();
-            foreach (var actor in actorID)
+            else
             {
-                movieActor.Add(context.Staffs.Find(actor.ActorsStaffId).FullName);
-            }
-            var directorID = context.MovieStaff1s.Where(director => director.IsDirectorMovieId == movie.MovieId).ToList();
-            foreach (var director in directorID)
-            {
-                movieDirector.Add(context.Staffs.Find(director.DirectorsStaffId).FullName);
+                isHide = true;
             }
         }
 
-        var client = new HttpClient();
-        var request = new HttpRequestMessage
+        /* private async Task TopOfMovies()
+         {
+             var client = new HttpClient();
+             var request = new HttpRequestMessage
+             {
+                 Method = HttpMethod.Get,
+                 RequestUri = new Uri("https://imdb8.p.rapidapi.com/title/get-most-popular-movies?purchaseCountry=US&homeCountry=US&currentCountry=US"),
+                 Headers =
+     {
+             { "x-rapidapi-key", "c52a1ca29amsh6bfb99e075210f4p19de50jsn9d875c09c921" },
+             { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
+         },
+             };
+             using (var response = await client.SendAsync(request))
+             {
+                 var body = await response.Content.ReadAsStringAsync();
+             }
+         }*/
+
+        private async Task HandleSearch()
         {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri($"https://imdb8.p.rapidapi.com/title/auto-complete?q={movie.MovieId}"),
-            Headers =
-        {
+            if (searchMovie == null)
+            {
+                return;
+            }
+            Image = "https://i.pinimg.com/originals/10/b2/f6/10b2f6d95195994fca386842dae53bb2.png";
+            movieActor = new List<string>();
+            movieDirector = new List<string>();
+            movieTag = new List<string>();
+            using (var context = new MovieModels.MyMovieDBContext())
+            {
+                movie = context.Movies.FirstOrDefault(Index => Index.Title == searchMovie || Index.MovieId == searchMovie);
+                ID = movie.MovieId;
+                Name = movie.Title;
+                Rating = movie.AverageRating.ToString();
+                Language = movie.Language;
+                var tagID = context.MovieTags.Where(tag => tag.MoviesMovieId == movie.MovieId).ToList();
+                foreach (var tags in tagID)
+                {
+                    movieTag.Add(context.Tags.Find(tags.TagsTagId).Name);
+                }
+                var actorID = context.MovieStaffs.Where(actor => actor.IsActorMovieId == movie.MovieId).ToList();
+                foreach (var actor in actorID)
+                {
+                    movieActor.Add(context.Staffs.Find(actor.ActorsStaffId).FullName);
+                }
+                var directorID = context.MovieStaff1s.Where(director => director.IsDirectorMovieId == movie.MovieId).ToList();
+                foreach (var director in directorID)
+                {
+                    movieDirector.Add(context.Staffs.Find(director.DirectorsStaffId).FullName);
+                }
+            }
+
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"https://imdb8.p.rapidapi.com/title/auto-complete?q={movie.MovieId}"),
+                Headers =
+{
             { "x-rapidapi-key", "c52a1ca29amsh6bfb99e075210f4p19de50jsn9d875c09c921" },
             { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
         },
-        };
-        using (var response = await client.SendAsync(request))
-        {
-            var body = await response.Content.ReadAsStringAsync();
-            try
+            };
+            using (var response = await client.SendAsync(request))
             {
-                int startIndex = body.IndexOf("https");
-                int endIndex = body.IndexOf("width", startIndex);
-                Image = body.Substring(startIndex, (endIndex - startIndex) - 3);
-            }
-            catch
-            {
-                Image = "https://www.p-etalon.ru/global/images/prod/nophoto.png";
+                var body = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    int startIndex = body.IndexOf("https");
+                    int endIndex = body.IndexOf("width", startIndex);
+                    Image = body.Substring(startIndex, (endIndex - startIndex) - 3);
+                }
+                catch
+                {
+                    Image = "https://www.p-etalon.ru/global/images/prod/nophoto.png";
+                }
             }
         }
     }
-}
+</body>
