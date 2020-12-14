@@ -1,30 +1,36 @@
-﻿@using Microsoft.EntityFrameworkCore;
-@using Microsoft.Extensions.DependencyInjection;
-@using System.Collections.Generic;
-@using System.Text.Json
+﻿@using System.Collections.Generic;
 @using Microsoft.Extensions.Configuration
 @using System.Net.Http
+@using Models;
 
 @inject IConfiguration Config
 @page "/"
 
 <style>
-body { background-color:darkslateblue }
+    body {
+        background-color: darkslateblue
+    }
+
     input[type="text"], textarea {
         background-color: #d1d1d1;
     }
+
     div[type="div"], textarea {
         background-color: #703D8B;
     }
+
     h1[type="textH1"], text {
-        color:aliceblue;
+        color: aliceblue;
     }
+
     h5[type="textH5"], text {
         color: aliceblue;
     }
+
     p[type="textP"], text {
         color: aliceblue;
     }
+
     img {
         background-color: #703D8B;
     }
@@ -35,7 +41,7 @@ body { background-color:darkslateblue }
 
     <div class="text-center">
         <div class="p-2">
-            <input type="text" class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="searchMovie"/><br>
+            <input type="text" class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="searchMovie" /><br>
         </div>
         <div class="p-2">
             <button class="btn btn-primary btn-lg" @onclick="HandleSearch">Search the Movie API</button>
@@ -45,108 +51,114 @@ body { background-color:darkslateblue }
     <br>
     <br>
     <br>
-    <div align="center" class="container">
-        <div style="margin-bottom: 40px" class="col col-lg-4">
-            <div class="card h-100">
-                <img src="@Image"
-                     class="card-img-top"
-                     style="object-fit:contain; height: 300px">
-                <div type="div" class="card-body">
-                    <h5 type="textH5" class="card-title">@Name</h5>
-                    <p type="textP" class="card-text" align="left">
-                        ID:  @ID<br>
-                        Language:  @Language<br>
-                        Rating:  @Rating <br>
-                    <p></p>
-                    Actors:
-                    @if (movieActor != null && !isHide)
-                    {
-                        <ul>
-                            @foreach (var actor in movieActor)
-                            {
-                                <li>@actor</li>
-                            }
-                        </ul>
-                    }
-                    Directors:
-                    @if (movieDirector != null && !isHide)
-                    {
-                        <ul>
-                            @foreach (var director in movieDirector)
-                            {
-                                <li>@director</li>
-                            }
-                        </ul>
-                    }
-                    Tags:
-                    @if (movieTag != null && !isHide)
-                    {
-                        <ul>
-                            @foreach (var tag in movieTag)
-                            {
-                                <li>@tag</li>
-                            }
-                        </ul>
-                    }
-                    </p>
-                </div>
-                <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
-            </div>
-        </div>
-        <h1 type="textH1" class="text-center">Featured Movies</h1><br>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
-            @for (int i = 0; i < 9; i++)
-            {
-                <div style="margin-bottom: 40px" class="col col-lg-4">
-                    <div class="card h-100">
-                        <img src="@Image"
-                             class="card-img-top"
-                             style="object-fit: contain; height: 300px">
-                        <div type="div" class="card-body">
-                            <h5 type="textH5" class="card-title">@Name</h5>
-                            <p type="textP" class="card-text" align="left">
-                                ID:  @ID<br>
-                                Language:  @Language<br>
-                                Rating:  @Rating <br>
-                            <p></p>
-                            Actors:
-                            @if (movieActor != null && !isHide)
-                            {
-                                <ul>
-                                    @foreach (var actor in movieActor)
-                                    {
-                                        <li>@actor</li>
-                                    }
-                                </ul>
-                            }
-                            Directors:
-                            @if (movieDirector != null && !isHide)
-                            {
-                                <ul>
-                                    @foreach (var director in movieDirector)
-                                    {
-                                        <li>@director</li>
-                                    }
-                                </ul>
-                            }
-                            Tags:
-                            @if (movieTag != null && !isHide)
-                            {
-                                <ul>
-                                    @foreach (var tag in movieTag)
-                                    {
-                                        <li>@tag</li>
-                                    }
-                                </ul>
-                            }
-                            </p>
-                        </div>
-                        <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
+    @if (resultMovie != null)
+    {
+        <div align="center" class="container">
+            <div style="margin-bottom: 40px" class="col col-lg-4">
+                <div class="card h-100">
+                    <img src="@resultMovie.ImageOfMovie"
+                         class="card-img-top"
+                         style="object-fit:contain; height: 300px">
+                    <div type="div" class="card-body">
+                        <h5 type="textH5" class="card-title">@resultMovie.NameOfMovie</h5>
+                        <p type="textP" class="card-text" align="left">
+                            ID:  @resultMovie.IDOfMovie<br>
+                            Language:  @resultMovie.LanguageOfMovie<br>
+                            Rating:  @resultMovie.RatingOfMovie <br>
+                        <p></p>
+                        Actors:
+                        @if (resultMovie.movieActorOfMovie != null && !isHide)
+                        {
+                            <ul>
+                                @foreach (var actor in resultMovie.movieActorOfMovie)
+                                {
+                                    <li>@actor</li>
+                                }
+                            </ul>
+                        }
+                        Directors:
+                        @if (resultMovie.movieDirectorOfMovie != null && !isHide)
+                        {
+                            <ul>
+                                @foreach (var director in resultMovie.movieDirectorOfMovie)
+                                {
+                                    <li>@director</li>
+                                }
+                            </ul>
+                        }
+                        Tags:
+                        @if (resultMovie.movieTagOfMovie != null && !isHide)
+                        {
+                            <ul>
+                                @foreach (var tag in resultMovie.movieTagOfMovie)
+                                {
+                                    <li>@tag</li>
+                                }
+                            </ul>
+                        }
+                        </p>
                     </div>
+                    <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
+                </div>
+            </div>
+            @if (SimilarsMovies != null)
+            {
+                <h1 type="textH1" class="text-center">Featured Movies</h1><br>
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+                    @foreach (var simMovie in SimilarsMovies)
+                    {
+                        <div style="margin-bottom: 40px" class="col col-lg-4">
+                            <div class="card h-100">
+                                <img src="@simMovie.ImageOfMovie"
+                                     class="card-img-top"
+                                     style="object-fit: contain; height: 300px">
+                                <div type="div" class="card-body">
+                                    <h5 type="textH5" class="card-title">@simMovie.NameOfMovie</h5>
+                                    <p type="textP" class="card-text" align="left">
+                                        ID:  @simMovie.IDOfMovie<br>
+                                        Language:  @simMovie.LanguageOfMovie<br>
+                                        Rating:  @simMovie.RatingOfMovie<br>
+                                    <p></p>
+                                    Actors:
+                                    @if (simMovie.movieActorOfMovie != null && !isHide)
+                                    {
+                                        <ul>
+                                            @foreach (var actor in simMovie.movieActorOfMovie)
+                                            {
+                                                <li>@actor</li>
+                                            }
+                                        </ul>
+                                    }
+                                    Directors:
+                                    @if (simMovie.movieDirectorOfMovie != null && !isHide)
+                                    {
+                                        <ul>
+                                            @foreach (var director in simMovie.movieDirectorOfMovie)
+                                            {
+                                                <li>@director</li>
+                                            }
+                                        </ul>
+                                    }
+                                    Tags:
+                                    @if (simMovie.movieTagOfMovie != null && !isHide)
+                                    {
+                                        <ul>
+                                            @foreach (var tag in simMovie.movieTagOfMovie)
+                                            {
+                                                <li>@tag</li>
+                                            }
+                                        </ul>
+                                    }
+                                    </p>
+                                </div>
+                                <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
+                            </div>
+                        </div>
+                    }
                 </div>
             }
         </div>
-    </div>
+    }
 
 
     @code
@@ -156,13 +168,19 @@ body { background-color:darkslateblue }
         private string ID;
         private string Language;
         private string Rating;
-        private string Image = "https://via.placeholder.com/300x200";
+        private string Image;
         private bool isHide = true;
-        private List<String> TopMovies = new List<string>();
-        private List<String> movieActor = new List<string>();
-        private List<String> movieDirector = new List<string>();
-        private List<String> movieTag = new List<string>();
+        private static List<String> movieActor;
+        private static List<String> movieDirector;
+        private static List<String> movieTag;
         private MovieModels.Movie movie;
+        private static List<SimilarMovieClass> SimilarsMovies;
+        private static bool isSimilar = false;
+
+        private List<string> ListOfSimilarMovieID;
+
+        private SimilarMovieClass similarMovie;
+        private SimilarMovieClass resultMovie;
 
         private async Task ShowCard()
         {
@@ -176,46 +194,32 @@ body { background-color:darkslateblue }
             }
         }
 
-        /* private async Task TopOfMovies()
-         {
-             var client = new HttpClient();
-             var request = new HttpRequestMessage
-             {
-                 Method = HttpMethod.Get,
-                 RequestUri = new Uri("https://imdb8.p.rapidapi.com/title/get-most-popular-movies?purchaseCountry=US&homeCountry=US&currentCountry=US"),
-                 Headers =
-     {
-             { "x-rapidapi-key", "c52a1ca29amsh6bfb99e075210f4p19de50jsn9d875c09c921" },
-             { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
-         },
-             };
-             using (var response = await client.SendAsync(request))
-             {
-                 var body = await response.Content.ReadAsStringAsync();
-             }
-         }*/
-
-        private async Task HandleSearch()
+        private async Task GetMovie(string nameOfSeacrhMovie)
         {
-            if (searchMovie == null)
-            {
-                return;
-            }
+            movie = null;
             Image = "https://i.pinimg.com/originals/10/b2/f6/10b2f6d95195994fca386842dae53bb2.png";
             movieActor = new List<string>();
             movieDirector = new List<string>();
             movieTag = new List<string>();
             using (var context = new MovieModels.MyMovieDBContext())
             {
-                movie = context.Movies.FirstOrDefault(Index => Index.Title == searchMovie || Index.MovieId == searchMovie);
-                ID = movie.MovieId;
-                Name = movie.Title;
-                Rating = movie.AverageRating.ToString();
-                Language = movie.Language;
+                movie = context.Movies.FirstOrDefault(Index => Index.Title == nameOfSeacrhMovie || Index.MovieId == nameOfSeacrhMovie);
+                if (!isSimilar)
+                {
+                    movie.SimilarMovies = context.SimilarMovies.Where(similar => similar.SimilarMovies == movie.MovieId).ToList();
+                    foreach (var sim in movie.SimilarMovies)
+                    {
+                        ListOfSimilarMovieID.Add(sim.MovieId);
+                    }
+                }
                 var tagID = context.MovieTags.Where(tag => tag.MoviesMovieId == movie.MovieId).ToList();
                 foreach (var tags in tagID)
                 {
                     movieTag.Add(context.Tags.Find(tags.TagsTagId).Name);
+                }
+                if (movieTag.Count > 0)
+                {
+                    Console.WriteLine("HI");
                 }
                 var actorID = context.MovieStaffs.Where(actor => actor.IsActorMovieId == movie.MovieId).ToList();
                 foreach (var actor in actorID)
@@ -227,32 +231,60 @@ body { background-color:darkslateblue }
                 {
                     movieDirector.Add(context.Staffs.Find(director.DirectorsStaffId).FullName);
                 }
-            }
+                var client = new HttpClient();
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri($"https://imdb8.p.rapidapi.com/title/auto-complete?q={movie.MovieId}"),
+                    Headers =
+    {
+        { "x-rapidapi-key", "8430fdb3e0mshd07b70e9c0d04d1p13a0f6jsn016e6b2dc087" },
+        { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
+    },
+                };
+                using (var response = await client.SendAsync(request))
+                {
 
-            var client = new HttpClient();
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri($"https://imdb8.p.rapidapi.com/title/auto-complete?q={movie.MovieId}"),
-                Headers =
-{
-            { "x-rapidapi-key", "c52a1ca29amsh6bfb99e075210f4p19de50jsn9d875c09c921" },
-            { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
-        },
-            };
-            using (var response = await client.SendAsync(request))
-            {
-                var body = await response.Content.ReadAsStringAsync();
-                try
-                {
-                    int startIndex = body.IndexOf("https");
-                    int endIndex = body.IndexOf("width", startIndex);
-                    Image = body.Substring(startIndex, (endIndex - startIndex) - 3);
+                    var body = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        int startIndex = body.IndexOf("https");
+                        int endIndex = body.IndexOf("width", startIndex);
+                        Image = body.Substring(startIndex, (endIndex - startIndex) - 3);
+                    }
+                    catch
+                    {
+                        Image = "https://www.p-etalon.ru/global/images/prod/nophoto.png";
+                    }
                 }
-                catch
+                similarMovie = new SimilarMovieClass(movie.Title, movie.MovieId, movie.Language, movie.AverageRating.ToString(), Image, movieActor, movieDirector, movieTag);
+                if (isSimilar)
                 {
-                    Image = "https://www.p-etalon.ru/global/images/prod/nophoto.png";
+                    SimilarsMovies.Add(similarMovie);
                 }
+                else
+                {
+                    resultMovie = similarMovie;
+                }
+            }
+        }
+
+        private async Task HandleSearch()
+        {
+            resultMovie = null;
+            similarMovie = null;
+            SimilarsMovies = new List<SimilarMovieClass>();
+            ListOfSimilarMovieID = new List<string>();
+            isSimilar = false;
+            if (searchMovie == null)
+            {
+                return;
+            }
+            await GetMovie(searchMovie);
+            isSimilar = true;
+            foreach (var movie in ListOfSimilarMovieID)
+            {
+                await GetMovie(movie);
             }
         }
     }

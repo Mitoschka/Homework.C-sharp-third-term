@@ -12,6 +12,7 @@ namespace MovieWEBApp.MovieModels
             MovieStaff1s = new HashSet<MovieStaff1>();
             MovieStaffs = new HashSet<MovieStaff>();
             MovieTags = new HashSet<MovieTag>();
+            SimilarMovies = new HashSet<SimilarMovie>();
         }
 
         public string MovieId { get; set; }
@@ -22,5 +23,6 @@ namespace MovieWEBApp.MovieModels
         public virtual ICollection<MovieStaff1> MovieStaff1s { get; set; }
         public virtual ICollection<MovieStaff> MovieStaffs { get; set; }
         public virtual ICollection<MovieTag> MovieTags { get; set; }
+        public virtual ICollection<SimilarMovie> SimilarMovies { get; set; }
     }
 }

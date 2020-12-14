@@ -45,6 +45,24 @@ namespace MovieWEBApp.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SimilarMovie",
+                columns: table => new
+                {
+                    similarMoviesID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MovieID = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SimilarMovie", x => x.similarMoviesID);
+                    table.ForeignKey(
+                        name: "FK_SimilarMovie_Movies_MovieID",
+                        column: x => x.MovieID,
+                        principalTable: "Movies",
+                        principalColumn: "MovieID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MovieStaff",
                 columns: table => new
                 {
@@ -130,6 +148,11 @@ namespace MovieWEBApp.Migrations
                 name: "IX_MovieTag_tagsTagID",
                 table: "MovieTag",
                 column: "tagsTagID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SimilarMovie_MovieID",
+                table: "SimilarMovie",
+                column: "MovieID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -144,13 +167,16 @@ namespace MovieWEBApp.Migrations
                 name: "MovieTag");
 
             migrationBuilder.DropTable(
+                name: "SimilarMovie");
+
+            migrationBuilder.DropTable(
                 name: "Staffs");
 
             migrationBuilder.DropTable(
-                name: "Movies");
+                name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "Tags");
+                name: "Movies");
         }
     }
 }

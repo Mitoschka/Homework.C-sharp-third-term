@@ -21,6 +21,7 @@ namespace MovieWEBApp.MovieModels
         public virtual DbSet<MovieStaff> MovieStaffs { get; set; }
         public virtual DbSet<MovieStaff1> MovieStaff1s { get; set; }
         public virtual DbSet<MovieTag> MovieTags { get; set; }
+        public virtual DbSet<SimilarMovie> SimilarMovies { get; set; }
         public virtual DbSet<Staff> Staffs { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
 
@@ -107,6 +108,23 @@ namespace MovieWEBApp.MovieModels
                 entity.HasOne(d => d.TagsTag)
                     .WithMany(p => p.MovieTags)
                     .HasForeignKey(d => d.TagsTagId);
+            });
+
+            modelBuilder.Entity<SimilarMovie>(entity =>
+            {
+                entity.ToTable("SimilarMovie");
+
+                entity.HasIndex(e => e.MovieId, "IX_SimilarMovie_MovieID");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.MovieId).HasColumnName("MovieID");
+
+                entity.Property(e => e.SimilarMovies).HasColumnName("similarMovies");
+
+                entity.HasOne(d => d.Movie)
+                    .WithMany(p => p.SimilarMovies)
+                    .HasForeignKey(d => d.MovieId);
             });
 
             modelBuilder.Entity<Staff>(entity =>

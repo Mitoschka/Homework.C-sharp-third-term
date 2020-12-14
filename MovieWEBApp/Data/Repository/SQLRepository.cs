@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using MovieWEBApp.Models;
 
 namespace MovieWEBApp.Data.Repository
@@ -34,7 +35,6 @@ namespace MovieWEBApp.Data.Repository
 
         public static void GetMovieDB()
         {
-            int count = 0;
             GetDictionaryOfMoviesAndImdbID();
             GetDictionaryOfStaffNames();
             GetInfoActorsAndDirectors();
@@ -44,12 +44,10 @@ namespace MovieWEBApp.Data.Repository
             GetRatingsOfMovies();
             foreach(var movie in moviesWithImdbID)
             {
-                string tempImdbId = movie.Key;
-                List<Movie> similarMovie = moviesWithImdbID[tempImdbId].GetSimilarMovies();
+                HashSet<SimilarMovie> similarMovie = moviesWithImdbID[movie.Key].GetSimilarMovies();
                 movie.Value.similarMovie = similarMovie;
-                count++;
+                break;
             }
-            Console.WriteLine("hi");
         }
 
         public static void GetDictionaryOfMoviesAndImdbID()

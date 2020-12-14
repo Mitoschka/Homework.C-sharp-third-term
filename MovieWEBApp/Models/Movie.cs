@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace MovieWEBApp.Models
@@ -12,7 +11,7 @@ namespace MovieWEBApp.Models
         public HashSet<Staff> directors { get; set; }
         public HashSet<Tag> tags { get; set; }
         public float averageRating { get; set; }
-        public List<Movie> similarMovie { get; set; }
+        public HashSet<SimilarMovie> similarMovie { get; set; }
         public string MovieID { get; set; }
 
         public Movie(string title, string language, string MovieID)
@@ -22,28 +21,12 @@ namespace MovieWEBApp.Models
             actors = new HashSet<Staff>();
             directors = new HashSet<Staff>();
             tags = new HashSet<Tag>();
+            similarMovie = new HashSet<SimilarMovie>();
             averageRating = 0;
             this.MovieID = MovieID;
         }
 
-        /* public static string SearchMovie(string nameOfMovie)
-         {
-             string tempImdbId = "";
-             int compareResult = 0;
-             foreach (var movie in Program.moviesWithImdbID)
-             {
-                 compareResult = String.Compare(movie.Value.title, nameOfMovie,
-                                        StringComparison.OrdinalIgnoreCase);
-
-                 if (compareResult == 0)
-                 {
-                     tempImdbId = movie.Key;
-                 }
-             }
-             return tempImdbId;
-         }*/
-
-        public List<Movie> GetSimilarMovies()
+        public HashSet<SimilarMovie> GetSimilarMovies()
         {
             Dictionary<Movie, double> dictOfSimilarMovies = new Dictionary<Movie, double>();
             foreach (var movie in from tag in this.tags
@@ -102,15 +85,12 @@ namespace MovieWEBApp.Models
             dictOfSimilarMovies = dictOfSimilarMovies.OrderByDescending(
                 pair => pair.Value / maxValue * 0.5 + pair.Key.averageRating * 0.05).ToDictionary(
                 pair => pair.Key, pair => pair.Value / maxValue * 0.5 + pair.Key.averageRating * 0.05);
-            foreach (var item in dictOfSimilarMovies)
-            {
-                System.Console.WriteLine(item.Value + " " + item.Key.averageRating.ToString());
-            }
             int counter = 0;
-            List<Movie> toReturn = new List<Movie>();
+            HashSet<SimilarMovie> toReturn = new HashSet<SimilarMovie>();
             foreach (var item in dictOfSimilarMovies)
             {
-                toReturn.Add(item.Key);
+                SimilarMovie similarMovie = new SimilarMovie(item.Key.MovieID);
+                toReturn.Add(similarMovie);
                 counter++;
                 if (counter == 9)
                     break;

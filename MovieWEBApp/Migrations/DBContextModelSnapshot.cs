@@ -82,6 +82,21 @@ namespace MovieWEBApp.Migrations
                     b.ToTable("Movies");
                 });
 
+            modelBuilder.Entity("MovieWEBApp.Models.SimilarMovie", b =>
+                {
+                    b.Property<string>("similarMoviesID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("MovieID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("similarMoviesID");
+
+                    b.HasIndex("MovieID");
+
+                    b.ToTable("SimilarMovie");
+                });
+
             modelBuilder.Entity("MovieWEBApp.Models.Staff", b =>
                 {
                     b.Property<string>("StaffID")
@@ -151,6 +166,18 @@ namespace MovieWEBApp.Migrations
                         .HasForeignKey("tagsTagID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MovieWEBApp.Models.SimilarMovie", b =>
+                {
+                    b.HasOne("MovieWEBApp.Models.Movie", null)
+                        .WithMany("similarMovie")
+                        .HasForeignKey("MovieID");
+                });
+
+            modelBuilder.Entity("MovieWEBApp.Models.Movie", b =>
+                {
+                    b.Navigation("similarMovie");
                 });
 #pragma warning restore 612, 618
         }
