@@ -1,6 +1,5 @@
 ﻿@using System.Collections.Generic;
 @using Microsoft.Extensions.Configuration
-@using System.Net.Http
 @using Models;
 
 @inject IConfiguration Config
@@ -34,6 +33,16 @@
     img {
         background-color: #703D8B;
     }
+
+    a {
+        color: #ffffff;
+        text-decoration: none;
+    }
+
+        a:hover {
+            color: #00ffff;
+            text-decoration: underline;
+        }
 </style>
 
 <body>
@@ -41,7 +50,7 @@
 
     <div class="text-center">
         <div class="p-2">
-            <input type="text" class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="searchMovie" /><br>
+            <input type="text" class="form-control form-control-lg w-50 mx-auto mt-4" placeholder="Movie name" @bind-value="search" /><br>
         </div>
         <div class="p-2">
             <button class="btn btn-primary btn-lg" @onclick="HandleSearch">Search the Movie API</button>
@@ -51,59 +60,62 @@
     <br>
     <br>
     <br>
-    @if (resultMovie != null)
+    @if (allIsOk)
     {
         <div align="center" class="container">
-            <div style="margin-bottom: 40px" class="col col-lg-4">
-                <div class="card h-100">
-                    <img src="@resultMovie.ImageOfMovie"
-                         class="card-img-top"
-                         style="object-fit:contain; height: 300px">
-                    <div type="div" class="card-body">
-                        <h5 type="textH5" class="card-title">@resultMovie.NameOfMovie</h5>
-                        <p type="textP" class="card-text" align="left">
-                            ID:  @resultMovie.IDOfMovie<br>
-                            Language:  @resultMovie.LanguageOfMovie<br>
-                            Rating:  @resultMovie.RatingOfMovie <br>
-                        <p></p>
-                        Actors:
-                        @if (resultMovie.movieActorOfMovie != null && !isHide)
-                        {
-                            <ul>
-                                @foreach (var actor in resultMovie.movieActorOfMovie)
-                                {
-                                    <li>@actor</li>
-                                }
-                            </ul>
-                        }
-                        Directors:
-                        @if (resultMovie.movieDirectorOfMovie != null && !isHide)
-                        {
-                            <ul>
-                                @foreach (var director in resultMovie.movieDirectorOfMovie)
-                                {
-                                    <li>@director</li>
-                                }
-                            </ul>
-                        }
-                        Tags:
-                        @if (resultMovie.movieTagOfMovie != null && !isHide)
-                        {
-                            <ul>
-                                @foreach (var tag in resultMovie.movieTagOfMovie)
-                                {
-                                    <li>@tag</li>
-                                }
-                            </ul>
-                        }
-                        </p>
-                    </div>
-                    <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
-                </div>
-            </div>
-            @if (SimilarsMovies != null)
+            @if (isMovie && resultMovie != null)
             {
-                <h1 type="textH1" class="text-center">Featured Movies</h1><br>
+                <div style="margin-bottom: 40px" class="col col-lg-4">
+                    <div class="card h-100">
+                        <img src="@resultMovie.ImageOfMovie"
+                             class="card-img-top"
+                             style="object-fit:contain; height: 300px">
+                        <div type="div" class="card-body">
+                            <h5 type="textH5" class="card-title"><a href="" @onclick="(() => SearchMovie(resultMovie.NameOfMovie))">@resultMovie.NameOfMovie</a></h5>
+                            <p type="textP" class="card-text" align="left">
+                                ID: <a href="" @onclick="(() => SearchMovie(resultMovie.IDOfMovie))">@resultMovie.IDOfMovie</a><br>
+                                Language:  @resultMovie.LanguageOfMovie<br>
+                                Rating:  @resultMovie.RatingOfMovie <br>
+                                <br>
+                                Actors:
+                                @if (resultMovie.movieActorOfMovie != null && !isHide)
+                                {
+                                    <ul>
+                                        @foreach (var actor in resultMovie.movieActorOfMovie)
+                                        {
+                                            <li><a href="" @onclick="(() => SearchActor(actor))">@actor</a></li>
+                                        }
+                                    </ul>
+                                }
+                                Directors:
+                                @if (resultMovie.movieDirectorOfMovie != null && !isHide)
+                                {
+                                    <ul>
+                                        @foreach (var director in resultMovie.movieDirectorOfMovie)
+                                        {
+                                            <li><a href="" @onclick="(() => SearchDirector(director))">@director</a></li>
+                                        }
+                                    </ul>
+                                }
+                                Tags:
+                                @if (resultMovie.movieTagOfMovie != null && !isHide)
+                                {
+                                    <ul>
+                                        @foreach (var tag in resultMovie.movieTagOfMovie)
+                                        {
+                                            <li><a href="" @onclick="(() => SearchTag(tag))">@tag</a></li>
+                                        }
+                                    </ul>
+                                }
+                            </p>
+                        </div>
+                        <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
+                    </div>
+                </div>
+            }
+            @if (SimilarsMovies.Any())
+            {
+                <h1 type="textH1" class="text-center">@resultItems</h1><br>
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
                     @foreach (var simMovie in SimilarsMovies)
                     {
@@ -113,42 +125,42 @@
                                      class="card-img-top"
                                      style="object-fit: contain; height: 300px">
                                 <div type="div" class="card-body">
-                                    <h5 type="textH5" class="card-title">@simMovie.NameOfMovie</h5>
+                                    <h5 type="textH5" class="card-title"><a href="" @onclick="(() => SearchMovie(simMovie.NameOfMovie))">@simMovie.NameOfMovie</a></h5>
                                     <p type="textP" class="card-text" align="left">
-                                        ID:  @simMovie.IDOfMovie<br>
+                                        ID:  <a href="" @onclick="(() => SearchMovie(simMovie.IDOfMovie))">@simMovie.IDOfMovie</a><br>
                                         Language:  @simMovie.LanguageOfMovie<br>
                                         Rating:  @simMovie.RatingOfMovie<br>
-                                    <p></p>
-                                    Actors:
-                                    @if (simMovie.movieActorOfMovie != null && !isHide)
-                                    {
-                                        <ul>
-                                            @foreach (var actor in simMovie.movieActorOfMovie)
-                                            {
-                                                <li>@actor</li>
-                                            }
-                                        </ul>
-                                    }
-                                    Directors:
-                                    @if (simMovie.movieDirectorOfMovie != null && !isHide)
-                                    {
-                                        <ul>
-                                            @foreach (var director in simMovie.movieDirectorOfMovie)
-                                            {
-                                                <li>@director</li>
-                                            }
-                                        </ul>
-                                    }
-                                    Tags:
-                                    @if (simMovie.movieTagOfMovie != null && !isHide)
-                                    {
-                                        <ul>
-                                            @foreach (var tag in simMovie.movieTagOfMovie)
-                                            {
-                                                <li>@tag</li>
-                                            }
-                                        </ul>
-                                    }
+                                        <br>
+                                        Actors:
+                                        @if (simMovie.movieActorOfMovie != null && !isHide)
+                                        {
+                                            <ul>
+                                                @foreach (var actor in simMovie.movieActorOfMovie)
+                                                {
+                                                    <li><a href="" @onclick="(() => SearchActor(actor))">@actor</a></li>
+                                                }
+                                            </ul>
+                                        }
+                                        Directors:
+                                        @if (simMovie.movieDirectorOfMovie != null && !isHide)
+                                        {
+                                            <ul>
+                                                @foreach (var director in simMovie.movieDirectorOfMovie)
+                                                {
+                                                    <li><a href="" @onclick="(() => SearchDirector(director))">@director</a></li>
+                                                }
+                                            </ul>
+                                        }
+                                        Tags:
+                                        @if (simMovie.movieTagOfMovie != null && !isHide)
+                                        {
+                                            <ul>
+                                                @foreach (var tag in simMovie.movieTagOfMovie)
+                                                {
+                                                    <li><a href="" @onclick="(() => SearchTag(tag))">@tag</a></li>
+                                                }
+                                            </ul>
+                                        }
                                     </p>
                                 </div>
                                 <button class="btn btn-primary btn-lg" @onclick="ShowCard">Show/Hide</button>
@@ -160,29 +172,34 @@
         </div>
     }
 
-
     @code
-{
-        private string searchMovie;
-        private string Name;
-        private string ID;
-        private string Language;
-        private string Rating;
-        private string Image;
-        private bool isHide = true;
+    {
+        private string search;
+        private string Image = "https://www.p-etalon.ru/global/images/prod/nophoto.png";
         private static List<String> movieActor;
         private static List<String> movieDirector;
         private static List<String> movieTag;
-        private MovieModels.Movie movie;
         private static List<SimilarMovieClass> SimilarsMovies;
-        private static bool isSimilar = false;
 
-        private List<string> ListOfSimilarMovieID;
+        private static HashSet<string> ListOfMovieID;
 
+        private static HashSet<string> ListOfActor;
+
+        private MovieModels.Movie movie;
         private SimilarMovieClass similarMovie;
         private SimilarMovieClass resultMovie;
 
-        private async Task ShowCard()
+        private static bool isMovie = false;
+        private static bool isActor = false;
+        private static bool isDirector = false;
+        private static bool isTag = false;
+        private static bool isSimilar = false;
+        private static bool isHide = true;
+        private static bool allIsOk = false;
+
+        private static string resultItems;
+
+        private void ShowCard()
         {
             if (isHide)
             {
@@ -197,29 +214,21 @@
         private async Task GetMovie(string nameOfSeacrhMovie)
         {
             movie = null;
-            Image = "https://i.pinimg.com/originals/10/b2/f6/10b2f6d95195994fca386842dae53bb2.png";
             movieActor = new List<string>();
             movieDirector = new List<string>();
             movieTag = new List<string>();
             using (var context = new MovieModels.MyMovieDBContext())
             {
                 movie = context.Movies.FirstOrDefault(Index => Index.Title == nameOfSeacrhMovie || Index.MovieId == nameOfSeacrhMovie);
-                if (!isSimilar)
+                if (movie == null)
                 {
-                    movie.SimilarMovies = context.SimilarMovies.Where(similar => similar.SimilarMovies == movie.MovieId).ToList();
-                    foreach (var sim in movie.SimilarMovies)
-                    {
-                        ListOfSimilarMovieID.Add(sim.MovieId);
-                    }
+                    isMovie = false;
+                    throw new Exception("Is not a movie");
                 }
                 var tagID = context.MovieTags.Where(tag => tag.MoviesMovieId == movie.MovieId).ToList();
                 foreach (var tags in tagID)
                 {
                     movieTag.Add(context.Tags.Find(tags.TagsTagId).Name);
-                }
-                if (movieTag.Count > 0)
-                {
-                    Console.WriteLine("HI");
                 }
                 var actorID = context.MovieStaffs.Where(actor => actor.IsActorMovieId == movie.MovieId).ToList();
                 foreach (var actor in actorID)
@@ -231,61 +240,210 @@
                 {
                     movieDirector.Add(context.Staffs.Find(director.DirectorsStaffId).FullName);
                 }
-                var client = new HttpClient();
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri($"https://imdb8.p.rapidapi.com/title/auto-complete?q={movie.MovieId}"),
-                    Headers =
-    {
-        { "x-rapidapi-key", "8430fdb3e0mshd07b70e9c0d04d1p13a0f6jsn016e6b2dc087" },
-        { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
-    },
-                };
-                using (var response = await client.SendAsync(request))
-                {
-
-                    var body = await response.Content.ReadAsStringAsync();
-                    try
-                    {
-                        int startIndex = body.IndexOf("https");
-                        int endIndex = body.IndexOf("width", startIndex);
-                        Image = body.Substring(startIndex, (endIndex - startIndex) - 3);
-                    }
-                    catch
-                    {
-                        Image = "https://www.p-etalon.ru/global/images/prod/nophoto.png";
-                    }
-                }
+                //await Task.WhenAll(GetMovieImage(movie));
                 similarMovie = new SimilarMovieClass(movie.Title, movie.MovieId, movie.Language, movie.AverageRating.ToString(), Image, movieActor, movieDirector, movieTag);
-                if (isSimilar)
+                if (isMovie && !isSimilar)
                 {
-                    SimilarsMovies.Add(similarMovie);
+                    resultMovie = similarMovie;
+                    isSimilar = true;
                 }
                 else
                 {
-                    resultMovie = similarMovie;
+                    SimilarsMovies.Add(similarMovie);
                 }
             }
         }
 
         private async Task HandleSearch()
         {
-            resultMovie = null;
-            similarMovie = null;
-            SimilarsMovies = new List<SimilarMovieClass>();
-            ListOfSimilarMovieID = new List<string>();
-            isSimilar = false;
-            if (searchMovie == null)
+            if (search == null)
             {
                 return;
             }
-            await GetMovie(searchMovie);
-            isSimilar = true;
-            foreach (var movie in ListOfSimilarMovieID)
+            try
+            {
+                await SearchMovie(search);
+                return;
+            }
+            catch
+            {
+                isMovie = false;
+                try
+                {
+                    await SearchActor(search);
+                    await SearchDirector(search);
+                    if (!ListOfMovieID.Any() && !ListOfActor.Any())
+                    {
+                        throw new Exception("Is not a actor or director");
+                    }
+                }
+                catch
+                {
+                    isActor = false;
+                    isDirector = false;
+                    try
+                    {
+                        await SearchTag(search);
+                        return;
+                    }
+                    catch
+                    {
+                        ResetValue();
+                        search = "No results found :(";
+                        return;
+                    }
+                }
+            }
+            allIsOk = true;
+            return;
+        }
+
+        private async Task SearchMovie(string toSearch)
+        {
+            ResetValue();
+            using (var context = new MovieModels.MyMovieDBContext())
+            {
+                var thisMovie = context.Movies.FirstOrDefault(movie => movie.Title == toSearch || movie.MovieId == toSearch);
+                if (thisMovie == null)
+                {
+                    throw new Exception("Is not a movie");
+                }
+                isMovie = true;
+                var listOfMoviesWhereContainsThisMovie = context.SimilarMovies.Where(similar => similar.SimilarMovies == thisMovie.MovieId);
+                await GetMovie(toSearch);
+                foreach (var movie in listOfMoviesWhereContainsThisMovie)
+                {
+                    ListOfMovieID.Add(movie.MovieId);
+                }
+                search = thisMovie.Title;
+                resultItems = "Similar movies";
+            }
+            await SearchSimilarsMovies();
+            allIsOk = true;
+        }
+
+        private async Task SearchActor(string toSearch)
+        {
+            ResetValue();
+            ListOfActor = new HashSet<string>();
+            using (var context = new MovieModels.MyMovieDBContext())
+            {
+                var thisActor = context.Staffs.FirstOrDefault(actor => actor.FullName == toSearch || actor.StaffId == toSearch);
+                if (thisActor == null)
+                {
+                    return;
+                }
+                isActor = true;
+                var listOfMoviesWhereContainsThisActor = context.MovieStaffs.Where(movies => movies.ActorsStaffId == thisActor.StaffId);
+                foreach (var movie in listOfMoviesWhereContainsThisActor)
+                {
+                    ListOfMovieID.Add(movie.IsActorMovieId);
+                }
+                search = thisActor.FullName;
+                resultItems = $"Movies with {search}";
+                ListOfActor = ListOfMovieID;
+            }
+            await SearchSimilarsMovies();
+            allIsOk = true;
+        }
+
+        private async Task SearchDirector(string toSearch)
+        {
+            ResetValue();
+            using (var context = new MovieModels.MyMovieDBContext())
+            {
+                var thisDirector = context.Staffs.FirstOrDefault(director => director.FullName == toSearch || director.StaffId == toSearch);
+                if (thisDirector == null)
+                {
+                    return;
+                }
+                isDirector = true;
+                var listOfMoviesWhereContainsThisDirector = context.MovieStaff1s.Where(movies => movies.DirectorsStaffId == thisDirector.StaffId);
+                if (ListOfActor.Any())
+                {
+                    ListOfMovieID = ListOfActor;
+                }
+                foreach (var movie in listOfMoviesWhereContainsThisDirector)
+                {
+                    ListOfMovieID.Add(movie.IsDirectorMovieId);
+                }
+                search = thisDirector.FullName;
+                resultItems = $"Movies with {search}";
+            }
+            await SearchSimilarsMovies();
+            allIsOk = true;
+        }
+
+        private async Task SearchTag(string toSearch)
+        {
+            ResetValue();
+            using (var context = new MovieModels.MyMovieDBContext())
+            {
+                var thisTag = context.Tags.FirstOrDefault(tag => tag.Name == toSearch || tag.TagId == toSearch);
+                if (thisTag == null)
+                {
+                    throw new Exception("Is not a tag");
+                }
+                isTag = true;
+                var listOfMoviesWhereContainsThisTag = context.MovieTags.Where(movies => movies.TagsTagId == thisTag.TagId).Take(24);
+                foreach (var movie in listOfMoviesWhereContainsThisTag)
+                {
+                    ListOfMovieID.Add(movie.MoviesMovieId);
+                }
+                search = thisTag.Name;
+                resultItems = $"Movies with {search}";
+            }
+            await SearchSimilarsMovies();
+            allIsOk = true;
+        }
+
+        private async Task SearchSimilarsMovies()
+        {
+            foreach (var movie in ListOfMovieID)
             {
                 await GetMovie(movie);
             }
+        }
+
+        private async Task GetMovieImage(MovieModels.Movie movie)
+        {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"https://imdb8.p.rapidapi.com/title/auto-complete?q={movie.MovieId}"),
+                Headers =
+                     {
+                         { "x-rapidapi-key", "8430fdb3e0mshd07b70e9c0d04d1p13a0f6jsn016e6b2dc087" },
+                         { "x-rapidapi-host", "imdb8.p.rapidapi.com" },
+                     },
+            };
+            var response = await client.SendAsync(request).ConfigureAwait(false);
+            var body = await response.Content.ReadAsStringAsync();
+            try
+            {
+                int startIndex = body.IndexOf("https");
+                int endIndex = body.IndexOf("width", startIndex);
+                Image = body.Substring(startIndex, (endIndex - startIndex) - 3);
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        private void ResetValue()
+        {
+            isSimilar = false;
+            isHide = true;
+            allIsOk = false;
+            isMovie = false;
+            isActor = false;
+            isDirector = false;
+            isTag = false;
+            ListOfMovieID = new HashSet<string>();
+            SimilarsMovies = new List<SimilarMovieClass>();
+            resultMovie = null;
         }
     }
 </body>
